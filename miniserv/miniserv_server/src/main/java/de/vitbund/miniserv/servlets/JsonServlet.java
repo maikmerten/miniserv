@@ -19,6 +19,13 @@ public class JsonServlet extends HttpServlet {
     private final Miniserv server;
     private final JsonResponder responder;
     private final AuthChecker authChecker;
+    
+    private class Wrapper {
+        public final Object value;
+        public Wrapper(Object value) {
+            this.value = value;
+        }
+    }
 
     public JsonServlet(Miniserv server, JsonResponder responder, AuthChecker authChecker) {
         this.server = server;
@@ -53,6 +60,9 @@ public class JsonServlet extends HttpServlet {
             Object resObj;
             synchronized (server) {
                 resObj = responder.respond(json, session);
+                if(resObj instanceof String || resObj instanceof Number) {
+                    resObj = new Wrapper(resObj);
+                }
             }
 
             String resString = server.objectToJson(resObj);
