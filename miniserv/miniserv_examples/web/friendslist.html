@@ -1,0 +1,132 @@
+<!doctype html>
+<html>
+
+<head>
+    <title>Form</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <style>
+        body {
+            font-family: 'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+            font-size: 16pt;
+        }
+
+        table, th, td {
+            border: 1px solid black;
+            border-collapse: collapse;
+            padding: 5px;
+        }
+    </style>
+
+    <script>
+
+        function load(url, data, callback) {
+            let method = data ? "POST" : "GET";
+            let xhr = new XMLHttpRequest();
+            xhr.addEventListener("load", () => {
+                let responseData = JSON.parse(xhr.responseText)
+                if(callback) {
+                    callback(responseData)
+                }
+            })
+            xhr.open(method, url)
+            if(data) {
+                xhr.setRequestHeader("Content-Type", "application/json")
+                xhr.send(JSON.stringify(data))
+            } else {
+                xhr.send()
+            }
+        }
+
+        function addFriend() {
+            let inputName = document.querySelector("#name")
+            let inputSurname = document.querySelector("#surname")
+            let obj = {
+                "name": inputName.value,
+                "surname": inputSurname.value
+            }
+
+            load("/api/addfriend", obj, (responseData) => {
+                showFriends()
+            })
+
+        }
+
+        function removeFriend(idx) {
+            let obj = {
+                "idx": idx
+            }
+
+            load("/api/removefriend", obj, () => {
+                showFriends()
+            })
+        }
+
+        function showFriends() {
+            let tbody = document.querySelector("#persontbody")
+
+            load("/api/listfriends", null, (persons) => {
+                tbody.innerHTML = ""
+                for (let idx in persons) {
+                    let person = persons[idx]
+
+                    let tr = document.createElement("tr")
+                    tbody.append(tr)
+
+                    let td = document.createElement("td")
+                    tr.append(td)
+                    td.append(person.name)
+
+                    td = document.createElement("td")
+                    tr.append(td)
+                    td.append(person.surname)
+
+                    td = document.createElement("td")
+                    tr.append(td)
+                    let btnRemove = document.createElement("button")
+                    td.append(btnRemove)
+                    btnRemove.append("remove")
+                    btnRemove.addEventListener("click", () => {
+                        removeFriend(idx)
+                    })
+                }
+            })
+        }
+
+        function init() {
+            let btn = document.querySelector("#btn1")
+            btn.addEventListener("click", addFriend)
+            showFriends()
+
+        }
+        window.addEventListener("DOMContentLoaded", init)
+    </script>
+</head>
+
+<body>
+    <label for="name">Name:</label><br>
+    <input type="text" id="name" value="John">
+    
+    <br><br>
+
+    <label for="surname">Surname:</label><br>
+    <input type="text" id="surname" value="Doe"><br>
+    <button id="btn1">Add Friend!</button>
+
+    <br><br>
+
+    <table>
+        <tr>
+            <th>Name</th>
+            <th>Surname</th>
+            <th>Action</th>
+        </tr>
+        <tbody id="persontbody"></tbody>
+    </table>
+
+
+
+</body>
+
+</html>
