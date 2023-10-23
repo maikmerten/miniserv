@@ -1,8 +1,6 @@
 package de.vitbund.miniserv.examples.time;
 
 import de.vitbund.miniserv.Miniserv;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 /**
  *
@@ -13,7 +11,7 @@ public class TimeServer {
     public static void main(String[] args) {
         Miniserv server = new Miniserv(8000, true);
         
-        server.onGet("/api/time", (HttpServletRequest request, HttpSession session) -> {
+        server.onGet("/api/time", (request, session) -> {
             return new Time();
         });
         

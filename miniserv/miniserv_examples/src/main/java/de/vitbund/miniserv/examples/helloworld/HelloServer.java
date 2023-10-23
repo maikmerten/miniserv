@@ -1,8 +1,6 @@
 package de.vitbund.miniserv.examples.helloworld;
 
 import de.vitbund.miniserv.Miniserv;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 
 /**
  *
@@ -14,7 +12,7 @@ public class HelloServer {
         
         Miniserv server = new Miniserv();
         
-        server.onGet("/api/helloworld", (HttpServletRequest request, HttpSession session) -> {
+        server.onGet("/api/helloworld", (request, session) -> {
             return "Hello World";
         });
         

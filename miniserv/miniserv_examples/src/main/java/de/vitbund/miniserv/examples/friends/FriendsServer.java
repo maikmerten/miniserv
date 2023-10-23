@@ -2,8 +2,6 @@ package de.vitbund.miniserv.examples.friends;
 
 import de.vitbund.miniserv.AuthChecker;
 import de.vitbund.miniserv.Miniserv;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpSession;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,17 +17,17 @@ public class FriendsServer {
             return true;
         };
         
-        server.onPost("/api/friends", (HttpServletRequest request, HttpSession session) -> {
+        server.onPost("/api/friends", (request, session) -> {
             Person p = server.jsonToObject(request, Person.class);
             friends.add(p);
             return p;
         });
         
-        server.onGet("/api/friends", (HttpServletRequest request, HttpSession session) -> {
+        server.onGet("/api/friends", (request, session) -> {
             return friends;
         }, auth);
         
-        server.onDelete("/api/friends", (HttpServletRequest request, HttpSession session) -> {
+        server.onDelete("/api/friends", (request, session) -> {
             Idx idx = server.jsonToObject(request, Idx.class);
             friends.remove(idx.getIdx());
             return idx;
