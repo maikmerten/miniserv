@@ -6,6 +6,8 @@ import de.vitbund.miniserv.responders.NoParamResponder;
 import de.vitbund.miniserv.responders.Responder;
 import de.vitbund.miniserv.servlets.JsonServlet;
 import java.io.File;
+import java.util.HashMap;
+import java.util.Map;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.server.session.DefaultSessionCache;
@@ -25,12 +27,14 @@ public class Miniserv {
     private ServletContextHandler context;
     private final Gson gson;
     private boolean debugOut;
+    private final Map<String, JsonServlet> servlets;
 
     public Miniserv(int port, boolean debugOut) {
         this.webDir = System.getProperty("user.dir") + File.separator + "web";
         this.port = port;
         this.gson = new Gson();
         this.debugOut = debugOut;
+        this.servlets = new HashMap<>();
 
         try {
             System.setProperty("org.eclipse.jetty.LEVEL", "INFO");
@@ -91,9 +95,15 @@ public class Miniserv {
     
         
     public void addResponder(String pathSpec, String method, Responder responder, AuthChecker authChecker) {
-        JsonServlet jsonServlet = new JsonServlet(this, method, responder, authChecker);
-        ServletHolder holder = new ServletHolder(jsonServlet);
-        context.addServlet(holder, pathSpec);
+        JsonServlet servlet = servlets.get(pathSpec);
+        if(servlet == null) {
+            servlet = new JsonServlet(this);
+            servlets.put(pathSpec, servlet);
+            ServletHolder holder = new ServletHolder(servlet);
+            context.addServlet(holder, pathSpec);
+        }
+        Handler handler = new Handler(pathSpec, method, responder, authChecker);
+        servlet.addHandler(handler);
     }
     
 

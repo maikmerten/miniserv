@@ -1,6 +1,7 @@
 package de.vitbund.miniserv.servlets;
 
 import de.vitbund.miniserv.AuthChecker;
+import de.vitbund.miniserv.Handler;
 import de.vitbund.miniserv.Miniserv;
 import de.vitbund.miniserv.responders.JsonParamResponder;
 import de.vitbund.miniserv.responders.NoParamResponder;
@@ -11,6 +12,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  *
@@ -19,9 +22,7 @@ import java.io.IOException;
 public class JsonServlet extends HttpServlet {
 
     private final Miniserv server;
-    private final String method;
-    private final Responder responder;
-    private final AuthChecker authChecker;
+    private final Map<String, Handler> handlers;
 
     private class Wrapper {
 
@@ -31,25 +32,35 @@ public class JsonServlet extends HttpServlet {
             this.value = value;
         }
     }
+    
 
-    public JsonServlet(Miniserv server, String method, Responder responder, AuthChecker authChecker) {
+    public JsonServlet(Miniserv server) {
         this.server = server;
-        this.method = method;
-        this.responder = responder;
-        this.authChecker = authChecker;
+        this.handlers = new HashMap<>();
     }
     
-    private void checkMethod(String method) {
-        server.debugOut("Servlet method " + this.method + "     request method: " + method);
-        
-        
-        if(!this.method.equals(method)) {
-            throw new RuntimeException("Wrong HTTP method. This endpoint expects " + this.method + " but was invoked with " + method);
-        }
+    private String getKey(String uri, String method) {
+        return method + ": " + uri.trim();
+    }
+    
+    
+    public void addHandler(Handler handler) {
+        String key = getKey(handler.getUri(), handler.getMethod());
+        this.handlers.put(key, handler);
     }
 
+    
     private void handle(String method, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        checkMethod(method);
+        String uri = request.getRequestURI().trim();
+        String key = getKey(uri, method);
+        Handler handler = handlers.get(key);
+        if(handler == null) {
+            throw new RuntimeException("found no handler for " + uri + " with method " + method);
+        }
+        
+        Responder responder = handler.getResponder();
+        AuthChecker authChecker = handler.getAuthChecker();
+        
         
         HttpSession session = request.getSession();
         boolean debugOut = server.isDebugOut();
@@ -61,7 +72,7 @@ public class JsonServlet extends HttpServlet {
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
-        if (this.authChecker == null || this.authChecker.isAuthenticated(session)) {
+        if (authChecker == null || authChecker.isAuthenticated(session)) {
 
             String json = null;
             String contentType = request.getContentType();
