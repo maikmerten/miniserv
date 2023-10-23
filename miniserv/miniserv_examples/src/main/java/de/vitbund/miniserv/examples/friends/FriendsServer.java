@@ -13,7 +13,7 @@ public class FriendsServer {
 
         List<Person> friends = new ArrayList<>();
         
-        AuthChecker auth = (HttpSession) -> {
+        AuthChecker auth = (session) -> {
             return true;
         };
         
