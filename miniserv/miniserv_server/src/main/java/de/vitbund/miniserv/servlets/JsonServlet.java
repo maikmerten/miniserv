@@ -3,8 +3,7 @@ package de.vitbund.miniserv.servlets;
 import de.vitbund.miniserv.AuthChecker;
 import de.vitbund.miniserv.Handler;
 import de.vitbund.miniserv.Miniserv;
-import de.vitbund.miniserv.responders.JsonParamResponder;
-import de.vitbund.miniserv.responders.NoParamResponder;
+import de.vitbund.miniserv.responders.RequestResponder;
 import de.vitbund.miniserv.responders.Responder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
@@ -60,7 +59,7 @@ public class JsonServlet extends HttpServlet {
         
         Responder responder = handler.getResponder();
         AuthChecker authChecker = handler.getAuthChecker();
-        
+       
         
         HttpSession session = request.getSession();
         boolean debugOut = server.isDebugOut();
@@ -74,24 +73,11 @@ public class JsonServlet extends HttpServlet {
 
         if (authChecker == null || authChecker.isAuthenticated(session)) {
 
-            String json = null;
-            String contentType = request.getContentType();
-            if (contentType != null && contentType.equals("application/json")) {
-                json = new String(request.getInputStream().readAllBytes(), "utf-8");
-            }
-
-            if (debugOut) {
-                server.debugOut(" Request JSON: " + json);
-            }
-
             Object resObj = null;
             synchronized (server) {
-                if (responder instanceof JsonParamResponder) {
-                    JsonParamResponder resp = (JsonParamResponder) responder;
-                    resObj = resp.respond(json, session);
-                } else if (responder instanceof NoParamResponder) {
-                    NoParamResponder resp = (NoParamResponder) responder;
-                    resObj = resp.respond(session);
+                if (responder instanceof RequestResponder) {
+                    RequestResponder resp = (RequestResponder) responder;
+                    resObj = resp.respond(request, session);
                 }
             }
 

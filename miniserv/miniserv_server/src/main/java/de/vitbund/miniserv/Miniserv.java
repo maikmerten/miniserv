@@ -1,11 +1,12 @@
 package de.vitbund.miniserv;
 
 import com.google.gson.Gson;
-import de.vitbund.miniserv.responders.JsonParamResponder;
-import de.vitbund.miniserv.responders.NoParamResponder;
+import de.vitbund.miniserv.responders.RequestResponder;
 import de.vitbund.miniserv.responders.Responder;
 import de.vitbund.miniserv.servlets.JsonServlet;
+import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import org.eclipse.jetty.server.Server;
@@ -74,7 +75,6 @@ public class Miniserv {
         sessionHandler.setHttpOnly(true);
         return sessionHandler;
     }
-   
 
     public void start() {
         try {
@@ -92,11 +92,10 @@ public class Miniserv {
             throw new RuntimeException(t);
         }
     }
-    
-        
+
     public void addResponder(String pathSpec, String method, Responder responder, AuthChecker authChecker) {
         JsonServlet servlet = servlets.get(pathSpec);
-        if(servlet == null) {
+        if (servlet == null) {
             servlet = new JsonServlet(this);
             servlets.put(pathSpec, servlet);
             ServletHolder holder = new ServletHolder(servlet);
@@ -105,67 +104,78 @@ public class Miniserv {
         Handler handler = new Handler(pathSpec, method, responder, authChecker);
         servlet.addHandler(handler);
     }
-    
 
-    public void onGet(String pathSpec, NoParamResponder responder, AuthChecker authChecker) {
+    public void onGet(String pathSpec, RequestResponder responder, AuthChecker authChecker) {
         addResponder(pathSpec, "GET", responder, authChecker);
     }
-    
-    public void onGet(String pathSpec, NoParamResponder responder) {
+
+    public void onGet(String pathSpec, RequestResponder responder) {
         onGet(pathSpec, responder, null);
     }
-    
-    public void onPost(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+
+    public void onPost(String pathSpec, RequestResponder responder, AuthChecker authChecker) {
         addResponder(pathSpec, "POST", responder, authChecker);
     }
-    
-    public void onPost(String pathSpec, JsonParamResponder responder) {
+
+    public void onPost(String pathSpec, RequestResponder responder) {
         onPost(pathSpec, responder, null);
     }
-    
-    public void onPut(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+
+    public void onPut(String pathSpec, RequestResponder responder, AuthChecker authChecker) {
         addResponder(pathSpec, "PUT", responder, authChecker);
     }
-    
-    public void onPut(String pathSpec, JsonParamResponder responder) {
+
+    public void onPut(String pathSpec, RequestResponder responder) {
         onPost(pathSpec, responder, null);
     }
 
-    public void onDelete(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+    public void onDelete(String pathSpec, RequestResponder responder, AuthChecker authChecker) {
         addResponder(pathSpec, "DELETE", responder, authChecker);
     }
-    
-    public void onDelete(String pathSpec, JsonParamResponder responder) {
-        onDelete(pathSpec, responder, null);
-    }    
 
+    public void onDelete(String pathSpec, RequestResponder responder) {
+        onDelete(pathSpec, responder, null);
+    }
 
     public String objectToJson(Object o) {
-        synchronized(gson) {
+        synchronized (gson) {
             return gson.toJson(o);
         }
     }
 
     public <T> T jsonToObject(String json, Class<T> classOfT) {
-        synchronized(gson) {
+        synchronized (gson) {
             return gson.fromJson(json, classOfT);
         }
     }
-    
+
+    public <T> T jsonToObject(HttpServletRequest request, Class<T> classOfT) {
+        String json = null;
+        String contentType = request.getContentType();
+        if (contentType != null && contentType.equals("application/json")) {
+            try {
+                json = new String(request.getInputStream().readAllBytes(), "utf-8");
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        }
+        return jsonToObject(json, classOfT);
+    }
+
     public void setDebugOut(boolean b) {
         this.debugOut = b;
     }
-    
+
     public boolean isDebugOut() {
         return this.debugOut;
     }
-    
+
     public void debugOut(String s) {
-        if(this.debugOut) {
+        if (this.debugOut) {
             System.out.println(s);
         }
     }
-    
+
     public void setWebDir(String webDir) {
         this.webDir = webDir;
     }
@@ -176,7 +186,7 @@ public class Miniserv {
         String webDir = System.getProperty("user.dir");
         server.setWebDir(webDir);
         server.debugOut("Serving " + webDir + " on port " + port);
-        
+
         server.start();
     }
 
