@@ -101,7 +101,7 @@ public class Miniserv {
             ServletHolder holder = new ServletHolder(servlet);
             context.addServlet(holder, pathSpec);
         }
-        Handler handler = new Handler(pathSpec, method, responder, authChecker);
+        Handler handler = new Handler(method, responder, authChecker);
         servlet.addHandler(handler);
     }
 

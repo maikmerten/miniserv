@@ -1,7 +1,6 @@
 package de.vitbund.miniserv;
 
 import de.vitbund.miniserv.responders.Responder;
-import java.util.Objects;
 
 /**
  *
@@ -9,24 +8,14 @@ import java.util.Objects;
  */
 public class Handler {
     
-    private final String uri;
     private final String method;
     private final Responder responder;
     private final AuthChecker authChecker;
 
-    public Handler(String uri, String method, Responder responder, AuthChecker authChecker) {
-        this.uri = uri;
+    public Handler(String method, Responder responder, AuthChecker authChecker) {
         this.method = method;
         this.responder = responder;
         this.authChecker = authChecker;
-    }
-   
-
-    /**
-     * @return the uri
-     */
-    public String getUri() {
-        return uri;
     }
 
     /**

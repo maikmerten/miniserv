@@ -38,21 +38,14 @@ public class JsonServlet extends HttpServlet {
         this.handlers = new HashMap<>();
     }
     
-    private String getKey(String uri, String method) {
-        return method + ": " + uri.trim();
-    }
-    
-    
     public void addHandler(Handler handler) {
-        String key = getKey(handler.getUri(), handler.getMethod());
-        this.handlers.put(key, handler);
+        this.handlers.put(handler.getMethod(), handler);
     }
 
     
     private void handle(String method, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI().trim();
-        String key = getKey(uri, method);
-        Handler handler = handlers.get(key);
+        Handler handler = handlers.get(method);
         if(handler == null) {
             throw new RuntimeException("found no handler for " + uri + " with method " + method);
         }
