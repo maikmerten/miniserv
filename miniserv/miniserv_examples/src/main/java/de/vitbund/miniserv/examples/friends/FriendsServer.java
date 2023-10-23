@@ -17,17 +17,18 @@ public class FriendsServer {
             return true;
         };
         
-        server.onPost("/api/friends", (request, session) -> {
+        server.onPost("/api/friends", (request) -> {
             Person p = server.jsonToObject(request, Person.class);
             friends.add(p);
             return p;
         });
         
-        server.onGet("/api/friends", (request, session) -> {
+        server.onGet("/api/friends", (request) -> {
+            server.debugOut("Session id:" + request.getSession().getId());
             return friends;
         }, auth);
         
-        server.onDelete("/api/friends", (request, session) -> {
+        server.onDelete("/api/friends", (request) -> {
             Idx idx = server.jsonToObject(request, Idx.class);
             friends.remove(idx.getIdx());
             return idx;

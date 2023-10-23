@@ -12,7 +12,7 @@ public class HelloServer {
         
         Miniserv server = new Miniserv();
         
-        server.onGet("/api/helloworld", (request, session) -> {
+        server.onGet("/api/helloworld", (request) -> {
             return "Hello World";
         });
         

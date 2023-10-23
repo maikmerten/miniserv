@@ -70,7 +70,7 @@ public class JsonServlet extends HttpServlet {
             synchronized (server) {
                 if (responder instanceof RequestResponder) {
                     RequestResponder resp = (RequestResponder) responder;
-                    resObj = resp.respond(request, session);
+                    resObj = resp.respond(request);
                 }
             }
 
