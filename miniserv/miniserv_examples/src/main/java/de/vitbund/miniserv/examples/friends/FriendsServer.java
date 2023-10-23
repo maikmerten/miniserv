@@ -24,7 +24,6 @@ public class FriendsServer {
         });
         
         server.onGet("/api/friends", (request) -> {
-            server.debugOut("Session id:" + request.getSession().getId());
             return friends;
         }, auth);
         
