@@ -1,8 +1,10 @@
 package de.vitbund.miniserv.servlets;
 
 import de.vitbund.miniserv.AuthChecker;
-import de.vitbund.miniserv.JsonResponder;
 import de.vitbund.miniserv.Miniserv;
+import de.vitbund.miniserv.responders.JsonParamResponder;
+import de.vitbund.miniserv.responders.NoParamResponder;
+import de.vitbund.miniserv.responders.Responder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
@@ -17,31 +19,45 @@ import java.io.IOException;
 public class JsonServlet extends HttpServlet {
 
     private final Miniserv server;
-    private final JsonResponder responder;
+    private final String method;
+    private final Responder responder;
     private final AuthChecker authChecker;
-    
+
     private class Wrapper {
+
         public final Object value;
+
         public Wrapper(Object value) {
             this.value = value;
         }
     }
 
-    public JsonServlet(Miniserv server, JsonResponder responder, AuthChecker authChecker) {
+    public JsonServlet(Miniserv server, String method, Responder responder, AuthChecker authChecker) {
         this.server = server;
+        this.method = method;
         this.responder = responder;
         this.authChecker = authChecker;
     }
+    
+    private void checkMethod(String method) {
+        server.debugOut("Servlet method " + this.method + "     request method: " + method);
+        
+        
+        if(!this.method.equals(method)) {
+            throw new RuntimeException("Wrong HTTP method. This endpoint expects " + this.method + " but was invoked with " + method);
+        }
+    }
 
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    private void handle(String method, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        checkMethod(method);
+        
         HttpSession session = request.getSession();
         boolean debugOut = server.isDebugOut();
 
         if (debugOut) {
             server.debugOut("  Request URI: " + request.getRequestURI() + " (" + request.getMethod() + ")");
         }
-        
+
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
 
@@ -57,12 +73,23 @@ public class JsonServlet extends HttpServlet {
                 server.debugOut(" Request JSON: " + json);
             }
 
-            Object resObj;
+            Object resObj = null;
             synchronized (server) {
-                resObj = responder.respond(json, session);
-                if(resObj instanceof String || resObj instanceof Number) {
-                    resObj = new Wrapper(resObj);
+                if (responder instanceof JsonParamResponder) {
+                    JsonParamResponder resp = (JsonParamResponder) responder;
+                    resObj = resp.respond(json, session);
+                } else if (responder instanceof NoParamResponder) {
+                    NoParamResponder resp = (NoParamResponder) responder;
+                    resObj = resp.respond(session);
                 }
+            }
+
+            if (resObj == null) {
+                resObj = "null";
+            }
+
+            if (resObj instanceof String || resObj instanceof Number) {
+                resObj = new Wrapper(resObj);
             }
 
             String resString = server.objectToJson(resObj);
@@ -71,7 +98,6 @@ public class JsonServlet extends HttpServlet {
                 server.debugOut("Response JSON: " + resString + "\n");
             }
 
-            
             response.setStatus(HttpServletResponse.SC_OK);
             response.getWriter().println(resString);
         } else {
@@ -85,8 +111,23 @@ public class JsonServlet extends HttpServlet {
     }
 
     @Override
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handle("GET", request, response);
+    }
+
+    @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
-        doGet(request, response);
+        handle("POST", request, response);
+    }
+
+    @Override
+    protected void doPut(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handle("PUT", request, response);
+    }
+
+    @Override
+    protected void doDelete(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        handle("DELETE", request, response);
     }
 
 }

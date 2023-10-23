@@ -21,8 +21,7 @@
 
     <script>
 
-        function load(url, data, callback) {
-            let method = data ? "POST" : "GET";
+        function load(url, method, data, callback) {
             let xhr = new XMLHttpRequest();
             xhr.addEventListener("load", () => {
                 let responseData = JSON.parse(xhr.responseText)
@@ -39,6 +38,18 @@
             }
         }
 
+        function doGet(url, callback) {
+            load(url, "GET", null, callback)
+        }
+
+        function doPost(url, data, callback) {
+            load(url, "POST", data, callback)
+        }
+
+        function doDelete(url, data, callback) {
+            load(url, "DELETE", data, callback)
+        }
+
         function addFriend() {
             let inputName = document.querySelector("#name")
             let inputSurname = document.querySelector("#surname")
@@ -47,7 +58,7 @@
                 "surname": inputSurname.value
             }
 
-            load("/api/addfriend", obj, (responseData) => {
+            doPost("/api/addfriend", obj, (responseData) => {
                 showFriends()
             })
 
@@ -58,7 +69,7 @@
                 "idx": idx
             }
 
-            load("/api/removefriend", obj, () => {
+            doDelete("/api/removefriend", obj, () => {
                 showFriends()
             })
         }
@@ -66,7 +77,7 @@
         function showFriends() {
             let tbody = document.querySelector("#persontbody")
 
-            load("/api/listfriends", null, (persons) => {
+            doGet("/api/listfriends", (persons) => {
                 tbody.innerHTML = ""
                 for (let idx in persons) {
                     let person = persons[idx]

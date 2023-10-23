@@ -1,6 +1,9 @@
 package de.vitbund.miniserv;
 
 import com.google.gson.Gson;
+import de.vitbund.miniserv.responders.JsonParamResponder;
+import de.vitbund.miniserv.responders.NoParamResponder;
+import de.vitbund.miniserv.responders.Responder;
 import de.vitbund.miniserv.servlets.JsonServlet;
 import java.io.File;
 import org.eclipse.jetty.server.Server;
@@ -67,16 +70,7 @@ public class Miniserv {
         sessionHandler.setHttpOnly(true);
         return sessionHandler;
     }
-
-    public void addJsonResponder(String pathSpec, JsonResponder responder, AuthChecker authChecker) {
-        JsonServlet jsonServlet = new JsonServlet(this, responder, authChecker);
-        ServletHolder holder = new ServletHolder(jsonServlet);
-        context.addServlet(holder, pathSpec);
-    }
-    
-    public void addJsonResponder(String pathSpec, JsonResponder responder) {
-        addJsonResponder(pathSpec, responder, null);
-    }
+   
 
     public void start() {
         try {
@@ -94,6 +88,47 @@ public class Miniserv {
             throw new RuntimeException(t);
         }
     }
+    
+        
+    public void addResponder(String pathSpec, String method, Responder responder, AuthChecker authChecker) {
+        JsonServlet jsonServlet = new JsonServlet(this, method, responder, authChecker);
+        ServletHolder holder = new ServletHolder(jsonServlet);
+        context.addServlet(holder, pathSpec);
+    }
+    
+
+    public void onGet(String pathSpec, NoParamResponder responder, AuthChecker authChecker) {
+        addResponder(pathSpec, "GET", responder, authChecker);
+    }
+    
+    public void onGet(String pathSpec, NoParamResponder responder) {
+        onGet(pathSpec, responder, null);
+    }
+    
+    public void onPost(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+        addResponder(pathSpec, "POST", responder, authChecker);
+    }
+    
+    public void onPost(String pathSpec, JsonParamResponder responder) {
+        onPost(pathSpec, responder, null);
+    }
+    
+    public void onPut(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+        addResponder(pathSpec, "PUT", responder, authChecker);
+    }
+    
+    public void onPut(String pathSpec, JsonParamResponder responder) {
+        onPost(pathSpec, responder, null);
+    }
+
+    public void onDelete(String pathSpec, JsonParamResponder responder, AuthChecker authChecker) {
+        addResponder(pathSpec, "DELETE", responder, authChecker);
+    }
+    
+    public void onDelete(String pathSpec, JsonParamResponder responder) {
+        onDelete(pathSpec, responder, null);
+    }    
+
 
     public String objectToJson(Object o) {
         synchronized(gson) {

@@ -13,7 +13,7 @@ public class HelloServer {
         
         Miniserv server = new Miniserv();
         
-        server.addJsonResponder("/api/helloworld", (String json, HttpSession session) -> {
+        server.onGet("/api/helloworld", (HttpSession session) -> {
             return "Hello World";
         });
         

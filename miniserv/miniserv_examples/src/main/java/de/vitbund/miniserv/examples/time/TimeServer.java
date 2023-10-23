@@ -12,7 +12,7 @@ public class TimeServer {
     public static void main(String[] args) {
         Miniserv server = new Miniserv(8000, true);
         
-        server.addJsonResponder("/api/time", (String json, HttpSession session) -> {
+        server.onGet("/api/time", (HttpSession session) -> {
             return new Time();
         });
         
