@@ -158,6 +158,9 @@ public class Miniserv {
         if (contentType != null && contentType.equals("application/json")) {
             try {
                 json = new String(request.getInputStream().readAllBytes(), "utf-8");
+                if(debugOut) {
+                    debugOut(" Request JSON: " + json);
+                }
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
