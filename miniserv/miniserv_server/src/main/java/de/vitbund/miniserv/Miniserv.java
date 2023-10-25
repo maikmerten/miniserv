@@ -9,16 +9,16 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
+import org.eclipse.jetty.ee10.servlet.DefaultServlet;
+import org.eclipse.jetty.ee10.servlet.ServletContextHandler;
+import org.eclipse.jetty.ee10.servlet.ServletHolder;
+import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
-import org.eclipse.jetty.server.session.DefaultSessionCache;
-import org.eclipse.jetty.server.session.FileSessionDataStore;
-import org.eclipse.jetty.server.session.SessionCache;
-import org.eclipse.jetty.server.session.SessionHandler;
-import org.eclipse.jetty.servlet.DefaultServlet;
-import org.eclipse.jetty.servlet.ServletContextHandler;
-import org.eclipse.jetty.servlet.ServletHolder;
-import org.eclipse.jetty.util.resource.Resource;
+import org.eclipse.jetty.session.DefaultSessionCache;
+import org.eclipse.jetty.session.FileSessionDataStore;
+import org.eclipse.jetty.session.SessionCache;
+import org.eclipse.jetty.util.resource.ResourceFactory;
 
 public class Miniserv {
 
@@ -77,9 +77,12 @@ public class Miniserv {
     }
 
     public void start() {
-        try {
-            context.setBaseResource(Resource.newResource(webDir));
 
+        try (ResourceFactory.Closeable resourceFactory = ResourceFactory.closeable()) {
+            context.setBaseResource(resourceFactory.newResource(webDir));
+        }
+
+        try {
             // last in chain: Default to serving static assets from current workdir
             ServletHolder holderStatic = new ServletHolder("default", DefaultServlet.class);
             holderStatic.setInitParameter("dirAllowed", "true");
