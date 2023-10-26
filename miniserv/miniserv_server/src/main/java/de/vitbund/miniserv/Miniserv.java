@@ -15,6 +15,7 @@ import org.eclipse.jetty.ee10.servlet.ServletHolder;
 import org.eclipse.jetty.ee10.servlet.SessionHandler;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
+import org.eclipse.jetty.server.handler.gzip.GzipHandler;
 import org.eclipse.jetty.session.DefaultSessionCache;
 import org.eclipse.jetty.session.FileSessionDataStore;
 import org.eclipse.jetty.session.SessionCache;
@@ -88,6 +89,12 @@ public class Miniserv {
             holderStatic.setInitParameter("dirAllowed", "true");
             context.addServlet(holderStatic, "/");
 
+            // gzip compression
+            GzipHandler gzipHandler = new GzipHandler();
+            gzipHandler.setIncludedMethods("PUT", "POST", "GET");
+            gzipHandler.setHandler(server.getHandler());
+            server.setHandler(gzipHandler);
+            
             server.start();
             //server.dump(System.err);
             server.join();
