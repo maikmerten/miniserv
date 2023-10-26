@@ -2,6 +2,7 @@ package de.vitbund.miniserv.examples.friends;
 
 import de.vitbund.miniserv.AuthChecker;
 import de.vitbund.miniserv.Miniserv;
+import de.vitbund.miniserv.Response;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public class FriendsServer {
         server.onPost("/api/friends", (request) -> {
             Person p = server.jsonToObject(request, Person.class);
             friends.add(p);
-            return p;
+            return new Response(201, "added friend");
         });
         
         server.onGet("/api/friends", (request) -> {

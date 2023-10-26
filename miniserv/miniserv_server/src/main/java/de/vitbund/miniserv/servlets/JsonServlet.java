@@ -3,6 +3,9 @@ package de.vitbund.miniserv.servlets;
 import de.vitbund.miniserv.AuthChecker;
 import de.vitbund.miniserv.Handler;
 import de.vitbund.miniserv.Miniserv;
+import de.vitbund.miniserv.Response;
+import de.vitbund.miniserv.exceptions.AuthException;
+import de.vitbund.miniserv.exceptions.HttpException;
 import de.vitbund.miniserv.responders.RequestResponder;
 import de.vitbund.miniserv.responders.Responder;
 import jakarta.servlet.ServletException;
@@ -31,29 +34,26 @@ public class JsonServlet extends HttpServlet {
             this.value = value;
         }
     }
-    
 
     public JsonServlet(Miniserv server) {
         this.server = server;
         this.handlers = new HashMap<>();
     }
-    
+
     public void addHandler(Handler handler) {
         this.handlers.put(handler.getMethod(), handler);
     }
 
-    
     private void handle(String method, HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         String uri = request.getRequestURI().trim();
         Handler handler = handlers.get(method);
-        if(handler == null) {
+        if (handler == null) {
             throw new RuntimeException("found no handler for " + uri + " with method " + method);
         }
-        
+
         Responder responder = handler.getResponder();
         AuthChecker authChecker = handler.getAuthChecker();
-       
-        
+
         HttpSession session = request.getSession();
         boolean debugOut = server.isDebugOut();
 
@@ -63,41 +63,56 @@ public class JsonServlet extends HttpServlet {
 
         response.setContentType("application/json");
         response.setCharacterEncoding("utf-8");
+        Object resObj = "";
+        int httpCode = HttpServletResponse.SC_OK;
 
-        if (authChecker == null || authChecker.isAuthenticated(session)) {
-
-            Object resObj = null;
+        try {
             synchronized (server) {
+                if ((authChecker != null) && !authChecker.isAuthenticated(session)) {
+                    server.debugOut("### Session not authenticated, forbidden! ###\n");
+                    throw new AuthException();
+                }
+
                 if (responder instanceof RequestResponder) {
-                    RequestResponder resp = (RequestResponder) responder;
-                    resObj = resp.respond(request);
+                    try {
+                        RequestResponder resp = (RequestResponder) responder;
+                        resObj = resp.respond(request);
+                    } catch (Exception e) {
+                        server.debugOut("### Exception message: " + e.getMessage());
+                        throw new HttpException();
+                    }
                 }
             }
-
-            if (resObj == null) {
-                resObj = "null";
-            }
-
-            if (resObj instanceof String || resObj instanceof Number) {
-                resObj = new Wrapper(resObj);
-            }
-
-            String resString = server.objectToJson(resObj);
-
-            if (debugOut) {
-                server.debugOut("Response JSON: " + resString + "\n");
-            }
-
-            response.setStatus(HttpServletResponse.SC_OK);
-            response.getWriter().println(resString);
-        } else {
-            if (debugOut) {
-                server.debugOut("### Session not authenticated, forbidden! ###\n");
-            }
-            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-            response.getWriter().println("{\"status\":\"Forbidden\"}");
+        } catch (HttpException e) {
+            httpCode = e.getCode();
+            Map<String, Object> exceptionMap = new HashMap<>();
+            exceptionMap.put("code", e.getCode());
+            exceptionMap.put("message", e.getMessage());
+            resObj = exceptionMap;
+        }
+        
+        if (resObj == null) {
+            resObj = "null";
+        }
+        
+        if (resObj instanceof Response) {
+            Response r = (Response) resObj;
+            resObj = r.getResult();
+            httpCode = r.getCode();
         }
 
+        if (resObj instanceof String || resObj instanceof Number) {
+            resObj = new Wrapper(resObj);
+        }
+
+        String resString = server.objectToJson(resObj);
+
+        if (debugOut) {
+            server.debugOut("Response JSON: " + resString + "\n");
+        }
+
+        response.setStatus(httpCode);
+        response.getWriter().println(resString);
     }
 
     @Override
