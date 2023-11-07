@@ -61,8 +61,8 @@ public class JsonServlet extends HttpServlet {
             server.debugOut("  Request URI: " + request.getRequestURI() + " (" + request.getMethod() + ")");
         }
 
-        response.setContentType("application/json");
-        response.setCharacterEncoding("utf-8");
+        String encoding = "utf-8";
+        String contentType = "application/json";
         Object resObj = "";
         int httpCode = HttpServletResponse.SC_OK;
 
@@ -83,6 +83,7 @@ public class JsonServlet extends HttpServlet {
                     }
                 }
             }
+
         } catch (HttpException e) {
             httpCode = e.getCode();
             Map<String, Object> exceptionMap = new HashMap<>();
@@ -90,29 +91,36 @@ public class JsonServlet extends HttpServlet {
             exceptionMap.put("message", e.getMessage());
             resObj = exceptionMap;
         }
-        
+
         if (resObj == null) {
             resObj = "null";
         }
-        
+
         if (resObj instanceof Response) {
             Response r = (Response) resObj;
             resObj = r.getResult();
             httpCode = r.getCode();
+            contentType = r.getContentType();
         }
 
         if (resObj instanceof String || resObj instanceof Number) {
             resObj = new Wrapper(resObj);
         }
 
-        String resString = server.objectToJson(resObj);
-
-        if (debugOut) {
-            server.debugOut("Response JSON: " + resString + "\n");
-        }
-
         response.setStatus(httpCode);
-        response.getWriter().println(resString);
+        if (contentType.equals("application/json")) {
+            String resString = server.objectToJson(resObj);
+            if (debugOut) {
+                server.debugOut("Response JSON: " + resString + "\n");
+            }
+            response.setContentType(contentType);
+            response.setCharacterEncoding(encoding);
+            response.getWriter().println(resString);
+        } else {
+            byte[] resData = (byte[]) resObj;
+            response.setContentType(contentType);
+            response.getOutputStream().write(resData);
+        }
     }
 
     @Override

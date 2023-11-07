@@ -8,14 +8,26 @@ public class Response {
 
     private int code;
     private Object result;
+    private String contentType;
 
-    public Response(int code, Object result) {
+    public Response(int code, Object result, String contentType) {
         this.code = code;
         this.result = result;
+        this.contentType = contentType;
+        
+        if(!(contentType.equals("application/json"))) {
+            if(!(result instanceof byte[])) {
+                throw new IllegalArgumentException("result for content types other than application/json must be a byte array");
+            }
+        }
+    }
+    
+    public Response(int code, Object result) {
+        this(code, result, "application/json");
     }
     
     public Response(Object result) {
-        this(200, result);
+        this(200, result, "application/json");
     }
 
     /**
@@ -44,6 +56,20 @@ public class Response {
      */
     public void setResult(Object result) {
         this.result = result;
+    }
+
+    /**
+     * @return the content type
+     */
+    public String getContentType() {
+        return contentType;
+    }
+
+    /**
+     * @param contentType the content type to set
+     */
+    public void setContentType(String contentType) {
+        this.contentType = contentType;
     }
 
 }
