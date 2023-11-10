@@ -1,4 +1,4 @@
-package de.vitbund.miniserv.responders;
+package de.maikmerten.miniserv.responders;
 
 /**
  *

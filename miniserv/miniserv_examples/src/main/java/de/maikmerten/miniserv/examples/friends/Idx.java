@@ -1,4 +1,4 @@
-package de.vitbund.miniserv.examples.friends;
+package de.maikmerten.miniserv.examples.friends;
 
 /**
  *

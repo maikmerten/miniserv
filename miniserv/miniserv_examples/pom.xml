@@ -3,11 +3,11 @@
   <modelVersion>4.0.0</modelVersion>
   <parent>
     <artifactId>miniserv</artifactId>
-    <groupId>de.vitbund</groupId>
+    <groupId>de.maikmerten</groupId>
     <version>1.0-SNAPSHOT</version>
   </parent>
 
-  <groupId>de.vit</groupId>
+  <groupId>de.maikmerten</groupId>
   <artifactId>miniserv_examples</artifactId>
   <version>1.0-SNAPSHOT</version>
 

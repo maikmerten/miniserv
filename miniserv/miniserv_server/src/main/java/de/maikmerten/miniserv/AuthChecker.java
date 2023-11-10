@@ -1,4 +1,4 @@
-package de.vitbund.miniserv;
+package de.maikmerten.miniserv;
 
 import jakarta.servlet.http.HttpSession;
 

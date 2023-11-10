@@ -1,8 +1,8 @@
-package de.vitbund.miniserv.examples.friends;
+package de.maikmerten.miniserv.examples.friends;
 
-import de.vitbund.miniserv.AuthChecker;
-import de.vitbund.miniserv.Miniserv;
-import de.vitbund.miniserv.Response;
+import de.maikmerten.miniserv.AuthChecker;
+import de.maikmerten.miniserv.Miniserv;
+import de.maikmerten.miniserv.Response;
 import java.util.ArrayList;
 import java.util.List;
 

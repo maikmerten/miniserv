@@ -1,6 +1,6 @@
-package de.vitbund.miniserv.examples.time;
+package de.maikmerten.miniserv.examples.time;
 
-import de.vitbund.miniserv.Miniserv;
+import de.maikmerten.miniserv.Miniserv;
 
 /**
  *

@@ -1,13 +1,13 @@
-package de.vitbund.miniserv.servlets;
+package de.maikmerten.miniserv.servlets;
 
-import de.vitbund.miniserv.AuthChecker;
-import de.vitbund.miniserv.Handler;
-import de.vitbund.miniserv.Miniserv;
-import de.vitbund.miniserv.Response;
-import de.vitbund.miniserv.exceptions.AuthException;
-import de.vitbund.miniserv.exceptions.HttpException;
-import de.vitbund.miniserv.responders.RequestResponder;
-import de.vitbund.miniserv.responders.Responder;
+import de.maikmerten.miniserv.AuthChecker;
+import de.maikmerten.miniserv.Handler;
+import de.maikmerten.miniserv.Miniserv;
+import de.maikmerten.miniserv.Response;
+import de.maikmerten.miniserv.exceptions.AuthException;
+import de.maikmerten.miniserv.exceptions.HttpException;
+import de.maikmerten.miniserv.responders.RequestResponder;
+import de.maikmerten.miniserv.responders.Responder;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;

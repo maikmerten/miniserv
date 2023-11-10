@@ -1,4 +1,4 @@
-package de.vitbund.miniserv.exceptions;
+package de.maikmerten.miniserv.exceptions;
 
 import com.google.gson.annotations.Expose;
 

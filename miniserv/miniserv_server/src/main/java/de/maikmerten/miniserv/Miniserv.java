@@ -1,9 +1,9 @@
-package de.vitbund.miniserv;
+package de.maikmerten.miniserv;
 
 import com.google.gson.Gson;
-import de.vitbund.miniserv.responders.RequestResponder;
-import de.vitbund.miniserv.responders.Responder;
-import de.vitbund.miniserv.servlets.JsonServlet;
+import de.maikmerten.miniserv.responders.RequestResponder;
+import de.maikmerten.miniserv.responders.Responder;
+import de.maikmerten.miniserv.servlets.JsonServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.IOException;

@@ -1,6 +1,6 @@
-package de.vitbund.miniserv;
+package de.maikmerten.miniserv;
 
-import de.vitbund.miniserv.responders.Responder;
+import de.maikmerten.miniserv.responders.Responder;
 
 /**
  *

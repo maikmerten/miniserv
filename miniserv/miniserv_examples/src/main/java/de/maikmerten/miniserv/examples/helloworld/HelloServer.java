@@ -1,6 +1,6 @@
-package de.vitbund.miniserv.examples.helloworld;
+package de.maikmerten.miniserv.examples.helloworld;
 
-import de.vitbund.miniserv.Miniserv;
+import de.maikmerten.miniserv.Miniserv;
 
 /**
  *

@@ -1,4 +1,4 @@
-package de.vitbund.miniserv.examples.time;
+package de.maikmerten.miniserv.examples.time;
 
 import java.util.Date;
 
