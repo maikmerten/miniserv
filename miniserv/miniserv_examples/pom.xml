@@ -23,7 +23,7 @@
 
   <dependencies>
     <dependency>
-      <groupId>de.vitbund</groupId>
+      <groupId>de.maikmerten</groupId>
       <artifactId>miniserv_server</artifactId>
       <version>1.0-SNAPSHOT</version>
     </dependency>

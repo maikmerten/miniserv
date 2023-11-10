@@ -33,7 +33,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>de.vitbund.miniserv.Miniserv</mainClass>
+                            <mainClass>de.maikmerten.miniserv.Miniserv</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>
