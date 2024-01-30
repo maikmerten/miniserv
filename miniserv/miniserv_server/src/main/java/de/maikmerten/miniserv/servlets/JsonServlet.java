@@ -79,6 +79,9 @@ public class JsonServlet extends HttpServlet {
                         resObj = resp.respond(request);
                     } catch (Exception e) {
                         server.debugOut("### Exception message: " + e.getMessage());
+                        if(e instanceof HttpException) {
+                            throw e;
+                        }
                         throw new HttpException();
                     }
                 }
