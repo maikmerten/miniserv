@@ -1,7 +1,5 @@
 package de.maikmerten.miniserv.exceptions;
 
-import com.google.gson.annotations.Expose;
-
 /**
  *
  * @author merten
