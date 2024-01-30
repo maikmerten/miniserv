@@ -77,11 +77,11 @@ public class JsonServlet extends HttpServlet {
                     try {
                         RequestResponder resp = (RequestResponder) responder;
                         resObj = resp.respond(request);
+                    } catch (HttpException e) {
+                        server.debugOut("### HttpException message: " + e.getMessage());
+                        throw e;
                     } catch (Exception e) {
                         server.debugOut("### Exception message: " + e.getMessage());
-                        if(e instanceof HttpException) {
-                            throw e;
-                        }
                         throw new HttpException();
                     }
                 }
