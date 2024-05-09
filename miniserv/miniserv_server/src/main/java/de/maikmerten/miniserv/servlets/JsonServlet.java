@@ -124,11 +124,11 @@ public class JsonServlet extends HttpServlet {
         } else {
             byte[] resData = (byte[]) resObj;
             response.setContentType(contentType);
-            response.getOutputStream().write(resData);
             if(fileName != null) {
                 fileName = fileName.replaceAll("\n", "");
                 response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
             }
+            response.getOutputStream().write(resData);
         }
     }
 
