@@ -63,6 +63,7 @@ public class JsonServlet extends HttpServlet {
 
         String encoding = "utf-8";
         String contentType = "application/json";
+        String fileName = null;
         Object resObj = "";
         int httpCode = HttpServletResponse.SC_OK;
 
@@ -104,6 +105,7 @@ public class JsonServlet extends HttpServlet {
             resObj = r.getResult();
             httpCode = r.getCode();
             contentType = r.getContentType();
+            fileName = r.getFileName();
         }
 
         if (resObj instanceof String || resObj instanceof Number) {
@@ -123,6 +125,10 @@ public class JsonServlet extends HttpServlet {
             byte[] resData = (byte[]) resObj;
             response.setContentType(contentType);
             response.getOutputStream().write(resData);
+            if(fileName != null) {
+                fileName = fileName.replaceAll("\n", "");
+                response.addHeader("Content-Disposition", "attachment; filename=" + fileName);
+            }
         }
     }
 
